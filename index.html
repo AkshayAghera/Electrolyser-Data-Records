@@ -160,7 +160,67 @@ th {
   width: 100% !important;
   height: 380px !important;
 }
+/* ================= MOBILE OPTIMIZATION ================= */
+@media screen and (max-width: 600px) {
+  /* Increase base font size for readability */
+  body { font-size: 14px; }
+  
+  .header h1 { font-size: 18px; }
+  .board, .chart-board, .engineer-panel { 
+    margin: 12px; 
+    padding: 16px; 
+  }
 
+  /* Make filter inputs larger and stacked for thumbs */
+  select, button {
+    width: 100%;
+    height: 45px;
+    font-size: 16px; /* Prevents iOS from auto-zooming on focus */
+  }
+
+  /* STACK THE TABLE: This turns columns into rows */
+  .table-wrapper { overflow-x: visible; }
+  
+  #dataTable, #dataTable thead, #dataTable tbody, #dataTable th, #dataTable td, #dataTable tr {
+    display: block;
+  }
+
+  /* Hide the header row for the stacked view */
+  #dataTable tr:first-child {
+    display: none;
+  }
+
+  #dataTable tr {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px;
+  }
+
+  #dataTable td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* This adds labels back to the stacked table */
+  #dataTable td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--blue-main);
+  }
+
+  /* CHART: Force a taller portrait height on mobile */
+  .chart-board {
+    height: 500px !important;
+  }
+}
 </style>
 </head>
 
@@ -290,11 +350,23 @@ function populateMonthDropdown(){
 function loadFilteredData(){
   const f = allData.filter(r=>r.Electrolyzer===electrolyser.value && r.Month===month.value);
   if(!f.length) return;
-  dataTable.innerHTML =
-    "<tr>"+Object.keys(f[0]).map(h=>`<th>${h}</th>`).join("")+"</tr>"+
-    f.map(r=>"<tr>"+Object.values(r).map(v=>`<td>${v}</td>`).join("")+"</tr>").join("");
+  
+  const headers = Object.keys(f[0]);
+  
+  // Build Header Row
+  let html = "<tr>" + headers.map(h=>`<th>${h}</th>`).join("") + "</tr>";
+  
+  // Build Data Rows with "data-label" for mobile stacking
+  f.forEach(r => {
+    html += "<tr>";
+    headers.forEach(h => {
+      html += `<td data-label="${h}">${r[h]}</td>`;
+    });
+    html += "</tr>";
+  });
+  
+  dataTable.innerHTML = html;
 }
-
 function generateTrend(){
   const elec = electrolyser.value;
   const selMonth = month.value;
