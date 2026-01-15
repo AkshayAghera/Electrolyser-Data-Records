@@ -163,62 +163,17 @@ th {
 }
 /* ================= MOBILE OPTIMIZATION ================= */
 @media screen and (max-width: 600px) {
-  /* Fix 1: The Graph (Wide & Scrollable) */
+  /* This creates the professional "window" for the graph */
   .chart-board {
-    overflow: hidden; /* Prevent the whole card from scrolling */
-    padding: 15px;
-  }
-  
-  /* Create a scrollable container for just the canvas */
-  .chart-board #trendChart {
-    display: block;
-    width: 800px !important; /* Force desktop width */
-    height: 350px !important;
-  }
-  
-  /* Make only the canvas area scrollable */
-  .chart-board {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: auto; 
+    padding: 20px;
+    background: #ffffff;
   }
 
-  /* Fix 2: Two-Column Table (Description vs Output) */
-  #dataTable thead { display: none; } 
-  
-  #dataTable tr {
-    display: block;
-    margin-bottom: 20px;
-    border: 2px solid var(--blue-main);
-    border-radius: 10px;
-    background: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  }
-
-  #dataTable td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 15px;
-    border-bottom: 1px solid #edf2f7;
-    font-size: 14px;
-  }
-
-  #dataTable td:last-child { border-bottom: none; }
-
-  /* Left Column (The "Description") */
-  #dataTable td::before {
-    content: attr(data-label);
-    font-weight: 700;
-    color: var(--blue-main);
-    text-align: left;
-    flex: 1;
-  }
-
-  /* Right Column (The "Output") */
-  #dataTable td {
-    text-align: right;
-    color: #334155;
-    font-weight: 500;
+  /* We force a wide canvas but keep it neat */
+  #trendChart {
+    min-width: 700px; /* Enough width for 12 months to breathe */
+    height: 300px !important;
   }
 }
 </style>
@@ -384,52 +339,72 @@ function generateTrend(){
   trendCard.style.display = "block";
   const unit = getUnitForParameter(param);
 
-  trendContext.textContent =
-    `Electrolyser ${elec} — ${param}${unit ? " ("+unit+")" : ""} — Last 12 Months (up to ${selMonth})`;
+  trendContext.textContent = 
+    `Electrolyser ${elec} — ${param}${unit ? " ("+unit+")" : ""} — Last 12 Months`;
 
   if(chart) chart.destroy();
 
+  // Match App Font and Colors
+  const appFont = "'Segoe UI', Arial, sans-serif";
+  const appBlue = "#1f3a5f";
+
   chart = new Chart(trendChart,{
-    type:"line",
-    data:{
+    type: "line",
+    data: {
       labels: trendData.map(r=>r.Month),
-      datasets:[{
-        label:param,
-        data:trendData.map(r=>Number(r[param])),
-        borderColor:"#1f77b4",
-        borderWidth:2.8,
-        tension:0.15,
-        pointRadius:5,
-        pointBackgroundColor:"#fff",
-        pointBorderColor:"#1f77b4",
-        pointBorderWidth:2,
-        fill:false
+      datasets: [{
+        label: param,
+        data: trendData.map(r=>Number(r[param])),
+        borderColor: appBlue,
+        borderWidth: 2,
+        backgroundColor: "rgba(31, 58, 95, 0.1)", // Light blue fill
+        tension: 0.3,
+        pointRadius: 4,
+        pointBackgroundColor: "#fff",
+        pointBorderColor: appBlue,
+        pointBorderWidth: 2,
+        fill: true
       }]
     },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{
-        x:{ grid:{display:false} },
-        y:{
-          beginAtZero:false,
-          grid:{color:"#e5eaf0"},
-          title:{ display:!!unit, text:unit }
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false } // Hide legend for cleaner look
+      },
+      scales: {
+        x: { 
+          grid: { display: false },
+          ticks: { 
+            font: { family: appFont, size: 10 }, // Smaller, professional font
+            color: "#6b7a90"
+          }
+        },
+        y: {
+          beginAtZero: false,
+          grid: { color: "#e6ebf1" },
+          ticks: { 
+            font: { family: appFont, size: 10 }, 
+            color: "#6b7a90"
+          },
+          title: { 
+            display: !!unit, 
+            text: unit,
+            font: { family: appFont, size: 11, weight: 'bold' }
+          }
         }
       }
     },
     plugins:[{
       afterDatasetsDraw(chart){
-        const ctx=chart.ctx;
+        const ctx = chart.ctx;
         ctx.save();
-        ctx.font="11px Segoe UI";
-        ctx.textAlign="center";
-        ctx.fillStyle="#2c3e50";
+        ctx.font = "bold 10px 'Segoe UI'";
+        ctx.textAlign = "center";
+        ctx.fillStyle = appBlue;
         chart.getDatasetMeta(0).data.forEach((p,i)=>{
-          ctx.fillText(
-            formatValueForDisplay(param, chart.data.datasets[0].data[i]),
-            p.x, p.y-10
-          );
+          const val = formatValueForDisplay(param, chart.data.datasets[0].data[i]);
+          ctx.fillText(val, p.x, p.y - 12);
         });
         ctx.restore();
       }
