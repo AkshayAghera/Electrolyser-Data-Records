@@ -1,6 +1,4 @@
-const CACHE_NAME = "electrolyser-ui-v1";
-const UI_ASSETS = [
-  "./",
+const CACHE_NAME = "electrolyser-ui-v2"; // Changed from v1 to v2  "./",
   "./index.html",
   "./chart.min.js",
   "./manifest.json"
