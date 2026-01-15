@@ -163,46 +163,61 @@ th {
 }
 /* ================= MOBILE OPTIMIZATION ================= */
 @media screen and (max-width: 600px) {
-  /* Fix 1: Make Graph Scrollable Sideways (keeps it clean/not messy) */
+  /* Fix 1: The Graph (Wide & Scrollable) */
   .chart-board {
-    overflow-x: auto; /* Allow sideways swipe for the graph */
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden; /* Prevent the whole card from scrolling */
+    padding: 15px;
   }
-  .chart-container {
-    width: 800px !important; /* Forces the graph to stay wide like desktop */
+  
+  /* Create a scrollable container for just the canvas */
+  .chart-board #trendChart {
+    display: block;
+    width: 800px !important; /* Force desktop width */
     height: 350px !important;
+  }
+  
+  /* Make only the canvas area scrollable */
+  .chart-board {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Fix 2: Two-Column Table (Description vs Output) */
-  #dataTable thead { display: none; } /* Hide old horizontal headers */
+  #dataTable thead { display: none; } 
   
   #dataTable tr {
     display: block;
     margin-bottom: 20px;
     border: 2px solid var(--blue-main);
-    border-radius: 8px;
+    border-radius: 10px;
     background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   }
 
   #dataTable td {
     display: flex;
-    justify-content: space-between; /* Description Left, Output Right */
+    justify-content: space-between;
+    align-items: center;
     padding: 12px 15px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #edf2f7;
+    font-size: 14px;
   }
 
-  /* The "Description" Column (Left) */
+  #dataTable td:last-child { border-bottom: none; }
+
+  /* Left Column (The "Description") */
   #dataTable td::before {
-    content: attr(data-label); 
-    font-weight: bold;
+    content: attr(data-label);
+    font-weight: 700;
     color: var(--blue-main);
-    flex: 1;
     text-align: left;
+    flex: 1;
   }
 
-  /* The "Output" Column (Right) */
+  /* Right Column (The "Output") */
   #dataTable td {
     text-align: right;
+    color: #334155;
     font-weight: 500;
   }
 }
@@ -335,18 +350,22 @@ function populateMonthDropdown(){
 function loadFilteredData() {
   const f = allData.filter(r => r.Electrolyzer === electrolyser.value && r.Month === month.value);
   if (!f.length) {
-    dataTable.innerHTML = "<tr><td style='text-align:center'>No data found</td></tr>";
+    dataTable.innerHTML = "<tr><td style='text-align:center; padding:20px;'>No data found</td></tr>";
     return;
   }
   
   const headers = Object.keys(f[0]);
-  let html = ""; // We skip the <thead> because CSS hides it anyway
+  let html = ""; 
 
   f.forEach(r => {
     html += "<tr>";
     headers.forEach(h => {
-      // The data-label="${h}" is what puts the name on the left column
-      html += `<td data-label="${h}">${r[h] || "-"}</td>`;
+      // Use formatValueForDisplay to keep units/decimals consistent in the table too
+      let val = r[h];
+      if(!isNaN(val) && h !== 'Electrolyzer' && h !== 'Month') {
+          val = formatValueForDisplay(h, val);
+      }
+      html += `<td data-label="${h}">${val || "-"}</td>`;
     });
     html += "</tr>";
   });
