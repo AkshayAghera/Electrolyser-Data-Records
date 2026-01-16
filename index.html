@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#1f3a5f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Electrolyser Data Records (Caustic Soda Plant)</title>
 
@@ -162,63 +163,47 @@ th {
 }
 /* ================= MOBILE OPTIMIZATION ================= */
 @media screen and (max-width: 600px) {
-  /* Increase base font size for readability */
-  body { font-size: 14px; }
-  
-  .header h1 { font-size: 18px; }
-  .board, .chart-board, .engineer-panel { 
-    margin: 12px; 
-    padding: 16px; 
-  }
-
-  /* Make filter inputs larger and stacked for thumbs */
-  select, button {
-    width: 100%;
-    height: 45px;
-    font-size: 16px; /* Prevents iOS from auto-zooming on focus */
-  }
-
-  /* STACK THE TABLE: This turns columns into rows */
-  .table-wrapper { overflow-x: visible; }
-  
+  /* This forces the table to act like a list of blocks */
   #dataTable, #dataTable thead, #dataTable tbody, #dataTable th, #dataTable td, #dataTable tr {
-    display: block;
+    display: block !important;
   }
 
-  /* Hide the header row for the stacked view */
+  /* Hide the original header row */
   #dataTable tr:first-child {
-    display: none;
+    display: none !important;
   }
 
   #dataTable tr {
     border: 1px solid #ccc;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     background: #fff;
     border-radius: 8px;
-    padding: 8px;
+    padding: 10px;
   }
 
   #dataTable td {
     border: none;
     position: relative;
-    padding-left: 50%;
+    padding-left: 50% !important; /* Space for the label */
     text-align: right;
     display: flex;
     justify-content: space-between;
     font-size: 14px;
     border-bottom: 1px solid #eee;
+    min-height: 35px;
+    align-items: center;
   }
 
-  /* This adds labels back to the stacked table */
+  /* This puts the column name on the left */
   #dataTable td::before {
     content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    white-space: nowrap;
+    text-align: left;
     font-weight: bold;
     color: var(--blue-main);
-  }
-
-  /* CHART: Force a taller portrait height on mobile */
-  .chart-board {
-    height: 500px !important;
   }
 }
 </style>
