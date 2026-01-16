@@ -1,4 +1,4 @@
-const CACHE_NAME = "electrolyser-ui-v3"; // Changed from v1 to v12  "./",
+const CACHE_NAME = "electrolyser-ui-v3"; // Changed from v1 to v13  "./",
   "./index.html",
   "./chart.min.js",
   "./manifest.json"
@@ -47,5 +47,6 @@ self.addEventListener("fetch", event => {
     caches.match(req).then(cached => cached || fetch(req))
   );
 });
+
 
 
